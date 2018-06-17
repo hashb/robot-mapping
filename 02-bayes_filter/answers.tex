@@ -1,0 +1,139 @@
+\documentclass{tufte-handout}
+
+\title{Assignment 2: Bayes Filter}
+
+\author[Kautilya Chenna]{Kautilya Chenna}
+
+%\date{28 March 2010} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+
+\usepackage{graphicx} % allow embedded images
+    \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+    \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+    \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+A robot is equipped with a manipulator to paint an object. 
+Furthermore, the robot has a sensor to detect whether the object 
+is colored or blank. Neither the manipulation unit nor the 
+sensor are perfect.
+
+$x_i$ is the state of the object, $u_i$ is the control command,
+$z$ is the sensor reading. Possible values taken by these 
+variables are,
+
+\begin{align}
+x &= \{colored, blank\}\\
+u &= \{paint, nothing\}\\
+z &= \{colored, blank\}
+\end{align}
+
+
+We are given the probabilities as follows,
+
+\begin{align}
+p(x_i = colored) &= 0.5\\
+p(x_i = blank) &= 0.5\\
+\end{align}
+
+Conditional probability table for sensor reading given the 
+object state
+
+\begin{table}
+	\centering
+	\begin{tabular}{c | c c}
+		$p(z\mid x_i)$& $x_i = colored$ & $x_i = blank$\\
+		\hline
+		$z = colored$ & 0.7 & 0.2\\
+		$z = blank$   & 0.3 & 0.8\\
+	\end{tabular}
+	\caption{Conditional probability table for $p(z \mid x_i)$}
+\end{table}
+
+We can assume that the system is Markovian. The state transition 
+probabilities are as given below
+
+\begin{table}
+	\centering
+	\begin{tabular}{c | c c}
+		$p(x_{t+1} \mid x_t, u_{t+1} = paint)$ & $x_t = colored$ & $x_t = blank$\\
+		\hline
+		$x_{t+1} = colored$ & 1.0 & 0.9\\
+		$x_{t+1} = blank$   & 0.0 & 0.1\\
+	\end{tabular}
+	\caption{State transition probability table for $p(x_{t+1} \mid x_t, u_{t+1})$}
+\end{table}
+
+From the notes, we know that to estimate the belief using 
+bayes filter, we must first do the estimation step, then
+the prediction step. The equations are as follows
+
+Prediction step:
+\begin{equation}
+\overline{bel}(x_t) = \int p(x_t \mid x_{t-1}, u_t) \times bel(x_{t-1}) dx_{t-1}
+\end{equation}
+
+Correction step:
+\begin{equation}
+bel(x_t) = \eta p(z_t \mid x_t) \times \overline{bel}(x_t)
+\end{equation}
+
+
+Since we don't know the initial state, we can assume 
+that both the states are equally probable, $bel(x_t) = 0.5$.
+
+Prediction step:
+\begin{multline}
+\overline{bel}(x_{t+1}) = p(x_{t+1} \mid x_t = colored, u_{t+1}) 
+							\times bel(x_t = colored) + \\
+							p(x_{t+1} \mid x_t = blank, u_{t+1}) 
+							\times bel(x_t = blank)
+\end{multline}
+
+\begin{align}
+\overline{bel}(x_{t+1} = colored) &= 1.0\times 0.5 + 0.9\times 0.5 = 0.95\\
+\overline{bel}(x_{t+1} = blank) &= 0.0\times 0.5 + 0.1\times 0.5 = 0.05
+\end{align}
+
+Correction step:
+\begin{align}
+bel(x_{t+1} = colored)  &= \eta p(z_{t+1} = blank \mid x_{t+1}) \times \overline{bel}(x_{t+1})\\
+					    &= \eta 0.3 \times 0.95 = \eta 0.285\\
+bel(x_{t+1} = blank)    &= \eta p(z_{t+1} = blank \mid x_{t+1}) \times \overline{bel}(x_{t+1})\\
+						&= \eta 0.8 \times 0.05 = \eta 0.04\\
+bel(x_{t+1} = colored)  &= \eta p(z_{t+1} = colored \mid x_{t+1}) \times \overline{bel}(x_{t+1})\\
+					    &= \eta 0.7 \times 0.95 = \eta 0.665\\
+bel(x_{t+1} = blank)    &= \eta p(z_{t+1} = colored \mid x_{t+1}) \times \overline{bel}(x_{t+1})\\
+						&= \eta 0.2 \times 0.05 = \eta 0.01
+\end{align}
+
+Normalizing factors are calculated to be
+\begin{align}
+\eta_{blank}   &= 3.0769\\
+\eta_{colored} &= 1.4815
+\end{align}
+
+If the sensor says the object is colored, the belief that
+the object is blank is $bel(x_{t+1} = blank) = 1.4815\times 0.01 = 0.014815$
+
+\end{document}
