@@ -1,0 +1,64 @@
+\documentclass{tufte-handout}
+
+\title{Assignment 3: Extended Kalman Filter}
+
+\author[Kautilya Chenna]{Kautilya Chenna}
+
+%\date{28 March 2010} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+
+\usepackage{graphicx} % allow embedded images
+    \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+    \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+    \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\section{Exercise 1: Bayes Filter and Extended Kalman Filter}
+\begin{fullwidth}
+\textsc{Question 1}: Describe briefly the two main steps of the Bayes filter in your own words.
+\end{fullwidth}
+
+First step is the prediction step where we use the motion model to update our belief and then we have the correction step where we use the observation model or the sensor model to correct our belief about the state.
+
+
+\begin{fullwidth}
+\textsc{Question 2}: Describe briefly the meaning of the following probability density functions.
+\end{fullwidth}
+
+$p(x_t \mid x_{t-1},u_t)$: Motion model
+
+$p(z_t\mid x_t)$: Sensor model
+
+$bel(x_t)$: belief of the state
+
+\begin{fullwidth}
+\textsc{Question 3}: Specify the distributions that correspond to the above mentioned three terms in the EKF.
+\end{fullwidth}
+
+All three distributions are Gaussian, since EKF assumes that the the distributions be Gaussian.
+
+\begin{fullwidth}
+	\textsc{Question 4}: Explain in a few sentences all of the components of the EKF algorithm
+\end{fullwidth}
+
+\end{document}
